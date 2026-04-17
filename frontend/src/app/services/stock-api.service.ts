@@ -18,6 +18,14 @@ export class StockApiService {
     return this.http.post<Product>(`${this.base}/api/products`, payload).pipe(catchError(this.mapError));
   }
 
+  updateProduct(id: string, payload: { code: string; description: string; balance: number }): Observable<Product> {
+    return this.http.put<Product>(`${this.base}/api/products/${id}`, payload).pipe(catchError(this.mapError));
+  }
+
+  deleteProduct(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/api/products/${id}`).pipe(catchError(this.mapError));
+  }
+
   health(): Observable<{ status: string; service: string }> {
     return this.http.get<{ status: string; service: string }>(`${this.base}/health`).pipe(catchError(this.mapError));
   }

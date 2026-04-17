@@ -29,6 +29,14 @@ export class BillingApiService {
     return this.http.post<Invoice>(`${this.base}/api/invoices`, { lines }).pipe(catchError(this.mapError));
   }
 
+  updateInvoice(id: string, lines: { id: string; quantity: number }[]): Observable<Invoice> {
+    return this.http.put<Invoice>(`${this.base}/api/invoices/${id}`, { lines }).pipe(catchError(this.mapError));
+  }
+
+  deleteInvoice(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/api/invoices/${id}`).pipe(catchError(this.mapError));
+  }
+
   printInvoice(id: string): Observable<Invoice> {
     return this.http.post<Invoice>(`${this.base}/api/invoices/${id}/print`, {}).pipe(catchError(this.mapError));
   }

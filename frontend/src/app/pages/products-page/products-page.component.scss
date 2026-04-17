@@ -1,21 +1,20 @@
 h1 {
-  margin: 0 0 8px;
+  @apply text-3xl font-semibold mb-2;
 }
 
 .muted {
-  color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 16px;
+  @apply text-slate-500 mb-6;
 }
 
 .card {
-  margin-bottom: 16px;
+  @apply mb-6;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 8px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .span-2 {
@@ -23,20 +22,15 @@ h1 {
 }
 
 .actions {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  @apply col-span-full flex flex-wrap gap-3 items-center;
 }
 
 .toolbar-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
+  @apply flex justify-end gap-3 mb-4;
 }
 
 .table {
-  width: 100%;
+  @apply w-full overflow-hidden rounded-[22px] border border-slate-200/70;
 }
 
 @media (max-width: 800px) {

@@ -1,10 +1,10 @@
-<mat-toolbar color="primary" class="toolbar">
-  <span class="brand">{{ title }}</span>
+<mat-toolbar color="primary" class="toolbar bg-slate-900 text-white px-6 py-4 shadow-lg">
+  <span class="brand text-lg font-semibold tracking-tight">Korp App</span>
   <span class="spacer"></span>
-  <a mat-button routerLink="/produtos" routerLinkActive="active">Produtos</a>
-  <a mat-button routerLink="/notas" routerLinkActive="active">Notas fiscais</a>
+  <a mat-button routerLink="/produtos" routerLinkActive="active" class="text-white">Produtos</a>
+  <a mat-button routerLink="/notas" routerLinkActive="active" class="text-white">Notas fiscais</a>
 </mat-toolbar>
 
-<main class="shell">
+<main class="shell py-8">
   <router-outlet />
 </main>

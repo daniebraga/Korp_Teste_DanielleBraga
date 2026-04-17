@@ -1,57 +1,120 @@
-<a mat-button routerLink="/notas">
-  <mat-icon>arrow_back</mat-icon>
-  Voltar
-</a>
-
-<div *ngIf="invoice() as inv" class="page">
-  <div class="header">
-    <div>
-      <h1>Nota nº {{ inv.sequentialNumber }}</h1>
-      <p class="muted">Status: <strong>{{ inv.status }}</strong></p>
-    </div>
-    <div class="actions">
-      <button
-        mat-flat-button
-        color="accent"
-        type="button"
-        (click)="print()"
-        [disabled]="printing() || inv.status !== 'Aberta'"
-      >
-        <mat-icon>print</mat-icon>
-        Imprimir NF
+<div class="invoice-detail-shell max-w-6xl mx-auto">
+  <div class="invoice-card bg-white shadow-2xl rounded-[28px] overflow-hidden ring-1 ring-slate-200">
+    <div class="invoice-card__header bg-slate-900 px-6 py-5 text-white flex items-center justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.24em] opacity-80">Emitir Nota Fiscal de Serviço (NFS-e)</p>
+        <h1 class="mt-2 text-2xl font-semibold">Nota nº {{ invoice()?.sequentialNumber }}</h1>
+      </div>
+      <button mat-icon-button type="button" routerLink="/notas" aria-label="Fechar" class="bg-white/10 hover:bg-white/20 text-white rounded-full p-2">
+        <mat-icon>close</mat-icon>
       </button>
     </div>
+
+    <div class="invoice-card__body px-6 py-8 space-y-6 lg:grid lg:grid-cols-[1.3fr_0.9fr] lg:gap-6 lg:space-y-0">
+      <section class="space-y-5">
+        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Informações da nota</p>
+              <h2 class="mt-2 text-lg font-semibold text-slate-900">Detalhes</h2>
+            </div>
+            <span class="pill" [class.open]="invoice()?.status === 'Aberta'" [class.closed]="invoice()?.status === 'Fechada'">
+              {{ invoice()?.status }}
+            </span>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Número</p>
+              <p class="mt-2 font-semibold text-slate-900">{{ invoice()?.sequentialNumber }}</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Emissão</p>
+              <p class="mt-2 font-semibold text-slate-900">{{ today | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <div class="sm:col-span-2">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Cliente</p>
+              <p class="mt-2 font-semibold text-slate-900">Consumidor Final</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Produtos / Serviços</p>
+          <div class="mt-4 space-y-3">
+            <div *ngFor="let row of invoice()?.lines">
+              <p class="font-semibold text-slate-800">{{ row.productCode }}</p>
+              <p class="text-sm text-slate-600">{{ row.productDescription }}</p>
+              <p class="text-sm text-slate-500">Qtd: {{ row.quantity }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="space-y-5">
+        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Informações da nota</p>
+              <h2 class="mt-2 text-lg font-semibold text-slate-900">Resumo</h2>
+            </div>
+            <button mat-icon-button type="button" aria-label="Opções" class="border border-slate-200 text-slate-700 rounded-full p-2">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+
+          <div class="rounded-[26px] border border-slate-200 bg-white p-5 text-center">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Valor da nota</p>
+            <p class="mt-4 text-4xl font-semibold text-slate-900">R$ {{ invoiceTotalValue() }}</p>
+          </div>
+
+          <div class="mt-5 space-y-3 text-sm text-slate-600">
+            <p class="font-semibold text-slate-800">Quantidade total</p>
+            <p>{{ invoiceTotalQuantity() }} itens</p>
+          </div>
+        </div>
+
+        <div class="panel rounded-3xl border border-slate-200 p-5 bg-white">
+          <button mat-flat-button color="primary" type="button" class="w-full mb-3" (click)="print()" [disabled]="printing() || invoice()?.status !== 'Aberta' || editing()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Emitir nota fiscal em PDF
+          </button>
+          <button mat-flat-button color="warn" type="button" class="w-full mb-3" (click)="deleteInvoice()" [disabled]="deleting() || editing()">
+            <mat-icon>delete</mat-icon>
+            Excluir nota fiscal
+          </button>
+          <button mat-stroked-button type="button" class="w-full" routerLink="/notas">
+            Fechar
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="px-6 pb-6">
+      <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white">
+        <div class="grid grid-cols-1 sm:grid-cols-[1.5fr_0.7fr_0.7fr] gap-4 bg-slate-50 px-5 py-4 text-slate-500 text-xs uppercase tracking-[0.18em] font-semibold">
+          <div>Código</div>
+          <div>Descrição</div>
+          <div class="text-center">Qtd</div>
+        </div>
+        <div *ngFor="let row of (editing() ? editableLines() : invoice()?.lines); let i = index" class="grid grid-cols-1 sm:grid-cols-[1.5fr_0.7fr_0.7fr] items-center gap-4 px-5 py-4 border-t border-slate-200">
+          <div>
+            <p class="font-semibold text-slate-900">{{ row.productCode }}</p>
+            <p class="text-sm text-slate-500">{{ row.productDescription }}</p>
+          </div>
+          <div class="text-center">
+            <ng-container *ngIf="editing(); else quantityText">
+              <input type="number" min="1" [value]="row.quantity" (change)="updateLineQuantity(i, $any($event.target).valueAsNumber)" class="w-20 rounded-2xl border border-slate-300 px-3 py-2 text-center" />
+            </ng-container>
+            <ng-template #quantityText>{{ row.quantity }}</ng-template>
+          </div>
+          <div class="text-center" *ngIf="editing()">
+            <button mat-icon-button color="warn" type="button" (click)="removeEditableLine(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div *ngIf="printing()" class="overlay" aria-live="polite">
-    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
-    <span>Processando impressão e baixa de estoque…</span>
-  </div>
-
-  <mat-card>
-    <mat-card-title>Itens</mat-card-title>
-    <mat-card-content>
-      <table mat-table [dataSource]="inv.lines" class="table">
-        <ng-container matColumnDef="productCode">
-          <th mat-header-cell *matHeaderCellDef>Código</th>
-          <td mat-cell *matCellDef="let row">{{ row.productCode }}</td>
-        </ng-container>
-        <ng-container matColumnDef="productDescription">
-          <th mat-header-cell *matHeaderCellDef>Descrição</th>
-          <td mat-cell *matCellDef="let row">{{ row.productDescription }}</td>
-        </ng-container>
-        <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef>Qtd</th>
-          <td mat-cell *matCellDef="let row">{{ row.quantity }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="columns"></tr>
-        <tr mat-row *matRowDef="let row; columns: columns"></tr>
-      </table>
-    </mat-card-content>
-  </mat-card>
-
-  <p class="hint">
-    Dica para o vídeo: interrompa o serviço de estoque e clique em Imprimir para demonstrar o tratamento de falha;
-    em seguida suba o serviço e repita a operação.
-  </p>
 </div>

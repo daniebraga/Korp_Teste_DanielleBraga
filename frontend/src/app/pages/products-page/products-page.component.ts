@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
-import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil, finalize } from 'rxjs';
 
 import { Product } from '../../models/api.models';
 import { BillingApiService } from '../../services/billing-api.service';
@@ -39,9 +39,12 @@ export class ProductsPageComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly assistant$ = new Subject<string>();
 
-  readonly displayedColumns: (keyof Product | 'actions')[] = ['code', 'description', 'balance'];
+  readonly displayedColumns: (keyof Product | 'actions')[] = ['code', 'description', 'balance', 'actions'];
   readonly products = signal<Product[]>([]);
   readonly loading = signal(false);
+  readonly editingProduct = signal<Product | null>(null);
+  readonly saving = signal(false);
+  readonly deletingProductId = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     code: ['', Validators.required],
@@ -90,10 +93,51 @@ export class ProductsPageComponent implements OnInit, OnDestroy {
       return;
     }
     const value = this.form.getRawValue();
-    this.stock.createProduct(value).subscribe({
+    const editing = this.editingProduct();
+    this.saving.set(true);
+
+    const request = editing
+      ? this.stock.updateProduct(editing.id, value)
+      : this.stock.createProduct(value);
+
+    request.pipe(finalize(() => this.saving.set(false))).subscribe({
       next: () => {
-        this.snack.open('Produto cadastrado com sucesso.', 'OK', { duration: 3500 });
+        const message = editing ? 'Produto atualizado com sucesso.' : 'Produto cadastrado com sucesso.';
+        this.snack.open(message, 'OK', { duration: 3500 });
+        this.editingProduct.set(null);
         this.form.reset({ code: '', description: '', balance: 0 });
+        this.refresh();
+      },
+      error: (err: Error) => this.snack.open(err.message, 'Fechar', { duration: 8000 })
+    });
+  }
+
+  startEdit(product: Product): void {
+    this.editingProduct.set(product);
+    this.form.setValue({
+      code: product.code,
+      description: product.description,
+      balance: product.balance
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingProduct.set(null);
+    this.form.reset({ code: '', description: '', balance: 0 });
+  }
+
+  deleteProduct(product: Product): void {
+    const confirmed = window.confirm(`Deseja excluir o produto ${product.code}?`);
+    if (!confirmed) {
+      return;
+    }
+    this.deletingProductId.set(product.id);
+    this.stock.deleteProduct(product.id).pipe(finalize(() => this.deletingProductId.set(null))).subscribe({
+      next: () => {
+        this.snack.open('Produto excluído com sucesso.', 'OK', { duration: 3500 });
+        if (this.editingProduct()?.id === product.id) {
+          this.cancelEdit();
+        }
         this.refresh();
       },
       error: (err: Error) => this.snack.open(err.message, 'Fechar', { duration: 8000 })

@@ -1,33 +1,32 @@
 .page {
+  @apply space-y-6;
   position: relative;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 1rem;
   align-items: flex-start;
-  margin: 12px 0 16px;
+  margin: 1rem 0 1.25rem;
 }
 
 .actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  @apply flex flex-wrap gap-3 items-center;
 }
 
 .muted {
-  color: rgba(0, 0, 0, 0.6);
+  @apply text-slate-500;
 }
 
 .table {
-  width: 100%;
+  @apply w-full overflow-hidden rounded-[22px] border border-slate-200/70;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,8 +37,8 @@
 }
 
 .hint {
-  margin-top: 16px;
-  color: rgba(0, 0, 0, 0.65);
+  @apply text-slate-600;
+  margin-top: 1rem;
 }
 
 @media print {
