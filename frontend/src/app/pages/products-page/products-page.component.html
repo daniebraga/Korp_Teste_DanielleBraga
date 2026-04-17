@@ -1,58 +1,62 @@
-<div class="space-y-4">
-  <div>
-    <h1 class="text-3xl font-semibold mb-2">Cadastro de produtos</h1>
-    <p class="muted">Dados persistidos no microsserviço de estoque (SQLite).</p>
-  </div>
+<div class="products-page space-y-6 pb-14 pt-0 sm:space-y-8 sm:pb-16">
+  <header class="page-hero">
+    <h1 class="page-title">Produtos</h1>
+  </header>
 
-  <mat-card class="card p-6">
-    <mat-card-title class="text-xl font-semibold mb-4">{{ editingProduct() ? 'Editar produto' : 'Novo produto' }}</mat-card-title>
-    <mat-card-content>
-      <form [formGroup]="form" class="grid gap-4 md:grid-cols-3" (ngSubmit)="submit()">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Código</mat-label>
-          <input matInput formControlName="code" />
-          <mat-hint>Obrigatório</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full md:col-span-2">
-          <mat-label>Descrição</mat-label>
-          <input matInput formControlName="description" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Saldo</mat-label>
-          <input matInput type="number" formControlName="balance" />
-        </mat-form-field>
-
-        <div class="actions md:col-span-3">
-          <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-            <mat-icon>{{ editingProduct() ? 'save' : 'add' }}</mat-icon>
-            {{ editingProduct() ? 'Salvar alterações' : 'Salvar' }}
-          </button>
-          <button mat-stroked-button type="button" (click)="suggest()" [disabled]="saving()">
-            <mat-icon>lightbulb_outline</mat-icon>
-            Assistente
-          </button>
-          <button mat-stroked-button type="button" *ngIf="editingProduct()" (click)="cancelEdit()">
-            <mat-icon>close</mat-icon>
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="card p-6">
-    <mat-card-title class="text-xl font-semibold mb-4">Estoque atual</mat-card-title>
-    <mat-card-content>
-      <div class="toolbar-row mb-4">
-        <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()">
-          <mat-icon>refresh</mat-icon>
+  <section class="products-kpis" aria-label="Resumo do estoque">
+    <div class="products-kpis__cell">
+      <span class="products-kpis__icon" aria-hidden="true">
+        <mat-icon class="!text-[20px]">inventory_2</mat-icon>
+      </span>
+      <div class="products-kpis__meta">
+        <p class="products-kpis__label">Cadastrados</p>
+        <p class="products-kpis__value">{{ productCount() }}</p>
+      </div>
+    </div>
+    <div class="products-kpis__cell">
+      <span class="products-kpis__icon" aria-hidden="true">
+        <mat-icon class="!text-[20px]">functions</mat-icon>
+      </span>
+      <div class="products-kpis__meta">
+        <p class="products-kpis__label">Saldo total</p>
+        <p class="products-kpis__value">{{ stockSum() }}</p>
+      </div>
+    </div>
+    <div class="products-kpis__cell">
+      <span class="products-kpis__icon products-kpis__icon--muted" aria-hidden="true">
+        <mat-icon *ngIf="loading(); else okIcon" class="!text-[20px]">hourglass_empty</mat-icon>
+        <ng-template #okIcon><mat-icon class="!text-[20px]">check</mat-icon></ng-template>
+      </span>
+      <div class="products-kpis__meta min-w-0">
+        <p class="products-kpis__label">Lista</p>
+        <p class="products-kpis__status">{{ loading() ? 'Atualizando…' : 'Sincronizada' }}</p>
+      </div>
+      <div class="products-kpis__actions">
+        <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()" class="!rounded-lg !text-xs sm:!text-sm">
           Atualizar
         </button>
       </div>
+    </div>
+  </section>
 
-      <table mat-table [dataSource]="products()" class="mat-elevation-z1 table">
+  <section class="ui-card min-h-0">
+    <div class="ui-card__head">
+      <div>
+        <h2 class="ui-card__title">Itens cadastrados</h2>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button mat-flat-button color="primary" type="button" (click)="openCreateDialog()" class="!h-9 !rounded-lg !text-sm !font-medium">
+          <mat-icon class="!mr-1 !text-[18px]">add</mat-icon>
+          Novo produto
+        </button>
+        <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()" class="!h-9 !rounded-lg !border-gray-300 !text-xs">
+          <mat-icon class="!mr-1 !text-[16px]">refresh</mat-icon>
+          Atualizar
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto px-4 pb-5 sm:px-6">
+      <table mat-table [dataSource]="products()" class="products-table mat-elevation-z0 w-full min-w-[480px]">
         <ng-container matColumnDef="code">
           <th mat-header-cell *matHeaderCellDef>Código</th>
           <td mat-cell *matCellDef="let p">{{ p.code }}</td>
@@ -62,13 +66,13 @@
           <td mat-cell *matCellDef="let p">{{ p.description }}</td>
         </ng-container>
         <ng-container matColumnDef="balance">
-          <th mat-header-cell *matHeaderCellDef>Saldo</th>
-          <td mat-cell *matCellDef="let p">{{ p.balance }}</td>
+          <th mat-header-cell *matHeaderCellDef class="!text-right">Saldo</th>
+          <td mat-cell *matCellDef="let p" class="tabular-nums !text-right">{{ p.balance }}</td>
         </ng-container>
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Ações</th>
-          <td mat-cell *matCellDef="let p">
-            <button mat-icon-button color="primary" type="button" (click)="startEdit(p)">
+          <th mat-header-cell *matHeaderCellDef class="!w-[96px] !text-right"></th>
+          <td mat-cell *matCellDef="let p" class="!text-right">
+            <button mat-icon-button color="primary" type="button" (click)="openEditDialog(p)" aria-label="Editar">
               <mat-icon>edit</mat-icon>
             </button>
             <button
@@ -77,15 +81,15 @@
               type="button"
               [disabled]="deletingProductId() === p.id"
               (click)="deleteProduct(p)"
+              aria-label="Excluir"
             >
-              <mat-icon>delete</mat-icon>
+              <mat-icon>delete_outline</mat-icon>
             </button>
           </td>
         </ng-container>
-
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 </div>

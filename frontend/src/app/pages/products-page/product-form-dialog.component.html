@@ -1,0 +1,46 @@
+<div class="product-dialog">
+  <div class="product-dialog__head">
+    <div class="product-dialog__head-icon" aria-hidden="true">
+      <mat-icon>{{ isEdit ? 'edit' : 'add_circle_outline' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="product-dialog__eyebrow">{{ isEdit ? 'Edição' : 'Cadastro' }}</h2>
+      <p class="product-dialog__title">{{ isEdit ? 'Editar produto' : 'Novo produto' }}</p>
+    </div>
+    <button type="button" mat-icon-button class="product-dialog__close" (click)="cancel()" aria-label="Fechar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="product-dialog__body">
+      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="code" autocomplete="off" />
+        <mat-hint>Obrigatório</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+        <mat-label>Descrição</mat-label>
+        <input matInput formControlName="description" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-full max-w-[200px]" subscriptSizing="dynamic">
+        <mat-label>Saldo</mat-label>
+        <input matInput type="number" formControlName="balance" />
+      </mat-form-field>
+    </div>
+
+    <div class="product-dialog__actions">
+      <button type="button" mat-stroked-button class="!rounded-lg !border-gray-300" (click)="cancel()" [disabled]="saving()">
+        Cancelar
+      </button>
+      <button type="button" mat-stroked-button class="!rounded-lg !border-gray-300" (click)="suggest()" [disabled]="saving()">
+        <mat-icon class="!mr-1 !text-[18px]">auto_awesome</mat-icon>
+        Assistente
+      </button>
+      <button mat-flat-button color="primary" type="submit" class="!rounded-lg !font-medium" [disabled]="saving()">
+        <mat-icon class="!mr-1 !text-[18px]">{{ isEdit ? 'save' : 'add' }}</mat-icon>
+        {{ isEdit ? 'Salvar' : 'Incluir' }}
+      </button>
+    </div>
+  </form>
+</div>

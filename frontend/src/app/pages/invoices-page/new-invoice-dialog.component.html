@@ -1,0 +1,81 @@
+<div class="invoice-dialog">
+  <div class="invoice-dialog__head">
+    <div class="invoice-dialog__head-icon" aria-hidden="true">
+      <mat-icon>note_add</mat-icon>
+    </div>
+    <div>
+      <h2 class="invoice-dialog__eyebrow">Nova nota</h2>
+      <p class="invoice-dialog__title">Monte os itens da nota</p>
+    </div>
+    <button type="button" mat-icon-button class="invoice-dialog__close" (click)="cancel()" aria-label="Fechar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="invoice-dialog__body">
+    <div class="invoice-dialog__row">
+      <mat-form-field appearance="outline" class="invoice-dialog__field-prod" subscriptSizing="dynamic">
+        <mat-label>Produto</mat-label>
+        <mat-select [formControl]="lineForm.controls.productId" [disabled]="loadingProducts()">
+          <mat-option *ngFor="let p of products()" [value]="p.id">
+            {{ p.code }} — {{ p.description }} ({{ p.balance }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="invoice-dialog__field-qty" subscriptSizing="dynamic">
+        <mat-label>Qtd</mat-label>
+        <input matInput type="number" [formControl]="lineForm.controls.quantity" />
+      </mat-form-field>
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="addLine()"
+        [disabled]="loadingProducts()"
+        class="invoice-dialog__add-line !h-[46px] shrink-0 !rounded-lg !border-gray-300 !text-sm"
+      >
+        <mat-icon class="!mr-1 !text-[18px]">add</mat-icon>
+        Linha
+      </button>
+    </div>
+
+    <div *ngIf="lines().length" class="invoice-dialog__table-wrap">
+      <table mat-table [dataSource]="lines()" class="draft-table mat-elevation-z0 w-full">
+        <ng-container matColumnDef="product">
+          <th mat-header-cell *matHeaderCellDef>Produto</th>
+          <td mat-cell *matCellDef="let row">{{ row.productCode }} — {{ row.productDescription }}</td>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef class="!w-20">Qtd</th>
+          <td mat-cell *matCellDef="let row" class="tabular-nums">{{ row.quantity }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="!w-12"></th>
+          <td mat-cell *matCellDef="let row; let i = index" class="!text-center">
+            <button mat-icon-button type="button" (click)="removeLine(i)" class="!text-gray-400 hover:!text-gray-700">
+              <mat-icon class="!text-[20px]">close</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['product', 'quantity', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['product', 'quantity', 'actions']"></tr>
+      </table>
+    </div>
+
+    <p *ngIf="!lines().length && !loadingProducts()" class="invoice-dialog__hint">Adicione uma ou mais linhas para criar a nota.</p>
+  </div>
+
+  <div class="invoice-dialog__actions">
+    <button type="button" mat-stroked-button class="!rounded-lg !border-gray-300" (click)="cancel()" [disabled]="saving()">Cancelar</button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="createInvoice()"
+      [disabled]="saving() || loadingProducts()"
+      class="!rounded-lg !font-medium"
+    >
+      <mat-icon class="!mr-1 !text-[18px]">note_add</mat-icon>
+      Criar nota aberta
+    </button>
+  </div>
+</div>

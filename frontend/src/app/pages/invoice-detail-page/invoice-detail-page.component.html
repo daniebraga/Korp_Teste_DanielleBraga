@@ -1,120 +1,195 @@
-<div class="invoice-detail-shell max-w-6xl mx-auto">
-  <div class="invoice-card bg-white shadow-2xl rounded-[28px] overflow-hidden ring-1 ring-slate-200">
-    <div class="invoice-card__header bg-slate-900 px-6 py-5 text-white flex items-center justify-between gap-4">
-      <div>
-        <p class="text-xs uppercase tracking-[0.24em] opacity-80">Emitir Nota Fiscal de Serviço (NFS-e)</p>
-        <h1 class="mt-2 text-2xl font-semibold">Nota nº {{ invoice()?.sequentialNumber }}</h1>
+<div class="page-shell max-w-4xl">
+  <header class="page-hero">
+    <p class="page-eyebrow">NFS-e · Demo</p>
+    <h1 class="page-title">Detalhe da nota {{ invoice()?.sequentialNumber }}</h1>
+    <p class="page-lead">Confira cliente, itens e valor; emita o PDF ou ajuste linhas enquanto a nota estiver aberta.</p>
+  </header>
+
+  <div class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04)]">
+    <div class="grid divide-y divide-gray-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+      <div class="px-6 py-5">
+        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400">Status</p>
+        <p class="mt-2">
+          <span
+            class="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
+            [class.bg-emerald-50]="invoice()?.status === 'Aberta'"
+            [class.text-emerald-800]="invoice()?.status === 'Aberta'"
+            [class.bg-gray-100]="invoice()?.status === 'Fechada'"
+            [class.text-gray-700]="invoice()?.status === 'Fechada'"
+          >
+            {{ invoice()?.status }}
+          </span>
+        </p>
       </div>
-      <button mat-icon-button type="button" routerLink="/notas" aria-label="Fechar" class="bg-white/10 hover:bg-white/20 text-white rounded-full p-2">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <div class="invoice-card__body px-6 py-8 space-y-6 lg:grid lg:grid-cols-[1.3fr_0.9fr] lg:gap-6 lg:space-y-0">
-      <section class="space-y-5">
-        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
-          <div class="flex items-center justify-between gap-4 mb-5">
-            <div>
-              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Informações da nota</p>
-              <h2 class="mt-2 text-lg font-semibold text-slate-900">Detalhes</h2>
-            </div>
-            <span class="pill" [class.open]="invoice()?.status === 'Aberta'" [class.closed]="invoice()?.status === 'Fechada'">
-              {{ invoice()?.status }}
-            </span>
-          </div>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Número</p>
-              <p class="mt-2 font-semibold text-slate-900">{{ invoice()?.sequentialNumber }}</p>
-            </div>
-            <div>
-              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Emissão</p>
-              <p class="mt-2 font-semibold text-slate-900">{{ today | date:'dd/MM/yyyy' }}</p>
-            </div>
-            <div class="sm:col-span-2">
-              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Cliente</p>
-              <p class="mt-2 font-semibold text-slate-900">Consumidor Final</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
-          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Produtos / Serviços</p>
-          <div class="mt-4 space-y-3">
-            <div *ngFor="let row of invoice()?.lines">
-              <p class="font-semibold text-slate-800">{{ row.productCode }}</p>
-              <p class="text-sm text-slate-600">{{ row.productDescription }}</p>
-              <p class="text-sm text-slate-500">Qtd: {{ row.quantity }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <aside class="space-y-5">
-        <div class="panel bg-slate-50 rounded-3xl border border-slate-200 p-5">
-          <div class="flex items-center justify-between gap-4 mb-5">
-            <div>
-              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Informações da nota</p>
-              <h2 class="mt-2 text-lg font-semibold text-slate-900">Resumo</h2>
-            </div>
-            <button mat-icon-button type="button" aria-label="Opções" class="border border-slate-200 text-slate-700 rounded-full p-2">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-          </div>
-
-          <div class="rounded-[26px] border border-slate-200 bg-white p-5 text-center">
-            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Valor da nota</p>
-            <p class="mt-4 text-4xl font-semibold text-slate-900">R$ {{ invoiceTotalValue() }}</p>
-          </div>
-
-          <div class="mt-5 space-y-3 text-sm text-slate-600">
-            <p class="font-semibold text-slate-800">Quantidade total</p>
-            <p>{{ invoiceTotalQuantity() }} itens</p>
-          </div>
-        </div>
-
-        <div class="panel rounded-3xl border border-slate-200 p-5 bg-white">
-          <button mat-flat-button color="primary" type="button" class="w-full mb-3" (click)="print()" [disabled]="printing() || invoice()?.status !== 'Aberta' || editing()">
-            <mat-icon>picture_as_pdf</mat-icon>
-            Emitir nota fiscal em PDF
-          </button>
-          <button mat-flat-button color="warn" type="button" class="w-full mb-3" (click)="deleteInvoice()" [disabled]="deleting() || editing()">
-            <mat-icon>delete</mat-icon>
-            Excluir nota fiscal
-          </button>
-          <button mat-stroked-button type="button" class="w-full" routerLink="/notas">
-            Fechar
-          </button>
-        </div>
-      </aside>
-    </div>
-
-    <div class="px-6 pb-6">
-      <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white">
-        <div class="grid grid-cols-1 sm:grid-cols-[1.5fr_0.7fr_0.7fr] gap-4 bg-slate-50 px-5 py-4 text-slate-500 text-xs uppercase tracking-[0.18em] font-semibold">
-          <div>Código</div>
-          <div>Descrição</div>
-          <div class="text-center">Qtd</div>
-        </div>
-        <div *ngFor="let row of (editing() ? editableLines() : invoice()?.lines); let i = index" class="grid grid-cols-1 sm:grid-cols-[1.5fr_0.7fr_0.7fr] items-center gap-4 px-5 py-4 border-t border-slate-200">
-          <div>
-            <p class="font-semibold text-slate-900">{{ row.productCode }}</p>
-            <p class="text-sm text-slate-500">{{ row.productDescription }}</p>
-          </div>
-          <div class="text-center">
-            <ng-container *ngIf="editing(); else quantityText">
-              <input type="number" min="1" [value]="row.quantity" (change)="updateLineQuantity(i, $any($event.target).valueAsNumber)" class="w-20 rounded-2xl border border-slate-300 px-3 py-2 text-center" />
-            </ng-container>
-            <ng-template #quantityText>{{ row.quantity }}</ng-template>
-          </div>
-          <div class="text-center" *ngIf="editing()">
-            <button mat-icon-button color="warn" type="button" (click)="removeEditableLine(i)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
+      <div class="px-6 py-5">
+        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400">Itens (qtd)</p>
+        <p class="mt-1 text-2xl font-semibold tabular-nums text-gray-900">{{ invoiceTotalQuantity() }}</p>
+      </div>
+      <div class="px-6 py-5">
+        <p class="text-[11px] font-medium uppercase tracking-wider text-gray-400">Valor estimado</p>
+        <p class="mt-1 text-2xl font-semibold tabular-nums text-emerald-800">R$ {{ invoiceTotalValue() }}</p>
       </div>
     </div>
   </div>
+
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
+    <a mat-button routerLink="/notas" class="!min-h-0 !px-0 !font-medium !text-emerald-800 hover:!underline">
+      <mat-icon class="!mr-1 !text-[18px]">arrow_back</mat-icon>
+      Voltar à lista
+    </a>
+  </div>
+
+  <article class="ui-card overflow-visible">
+    <div class="ui-card__head !border-emerald-100/80 !bg-emerald-50/40">
+      <div class="flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 text-emerald-800 ring-1 ring-emerald-200/60">
+          <mat-icon class="!text-[22px]">receipt_long</mat-icon>
+        </span>
+        <div>
+          <p class="ui-card__subtitle !text-emerald-800/80">Nota de serviço</p>
+          <h2 class="ui-card__title">Nota fiscal nº {{ invoice()?.sequentialNumber }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-0 lg:grid-cols-5">
+      <div class="space-y-0 border-b border-gray-200 lg:col-span-3 lg:border-b-0 lg:border-r">
+        <div class="border-b border-gray-100 bg-white px-6 py-6 sm:px-8">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</h2>
+          <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <dt class="text-xs text-gray-500">Nome</dt>
+              <dd class="mt-1 text-sm font-medium text-gray-900">Consumidor Final</dd>
+            </div>
+            <div>
+              <dt class="text-xs text-gray-500">Documento</dt>
+              <dd class="mt-1 text-sm text-gray-400">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-gray-50/80 px-6 py-6 sm:px-8">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Itens</h2>
+          <ul class="mt-4 divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white">
+            <li
+              *ngFor="let row of invoice()?.lines"
+              class="flex flex-wrap items-start justify-between gap-3 px-4 py-3.5 first:rounded-t-xl last:rounded-b-xl"
+            >
+              <div>
+                <p class="font-medium text-gray-900">{{ row.productCode }}</p>
+                <p class="text-sm text-gray-600">{{ row.productDescription }}</p>
+              </div>
+              <p class="tabular-nums text-sm font-medium text-gray-700">× {{ row.quantity }}</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex flex-col bg-gray-50 lg:col-span-2">
+        <div class="flex flex-1 flex-col px-6 py-6 sm:px-8">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Resumo</h2>
+          <div class="mt-5 space-y-3 rounded-xl border border-gray-200 bg-white p-4 text-sm">
+            <div class="flex justify-between gap-4">
+              <span class="text-gray-500">Valor estimado</span>
+              <span class="font-semibold tabular-nums text-gray-900">R$ {{ invoiceTotalValue() }}</span>
+            </div>
+            <div class="flex justify-between gap-4 border-t border-gray-100 pt-3">
+              <span class="text-gray-500">Quantidade total</span>
+              <span class="font-medium tabular-nums text-gray-900">{{ invoiceTotalQuantity() }}</span>
+            </div>
+          </div>
+          <p class="mt-4 text-xs leading-relaxed text-gray-500">Cálculo demo: quantidade × R$ 100,00. Impostos e retenções não aplicados.</p>
+        </div>
+
+        <div class="space-y-2 border-t border-gray-200 bg-white px-6 py-5 sm:px-8">
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            class="nf-cta !h-11 w-full !rounded-lg !font-medium"
+            (click)="print()"
+            [disabled]="printing() || invoice()?.status !== 'Aberta' || editing()"
+          >
+            <mat-icon class="!mr-2">picture_as_pdf</mat-icon>
+            Emitir PDF
+          </button>
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            class="!h-10 w-full !rounded-lg"
+            (click)="deleteInvoice()"
+            [disabled]="deleting() || editing()"
+          >
+            Excluir nota
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-200 bg-white px-6 py-6 sm:px-8">
+      <div *ngIf="invoice()?.status === 'Aberta'" class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h3 class="text-sm font-semibold text-gray-800">Edição de linhas</h3>
+        <div class="flex flex-wrap gap-2">
+          <button *ngIf="!editing()" mat-stroked-button type="button" class="!rounded-lg !border-gray-300" (click)="startEdit()">
+            <mat-icon class="!mr-1 !text-[18px]">edit</mat-icon>
+            Editar
+          </button>
+          <ng-container *ngIf="editing()">
+            <button mat-flat-button color="primary" type="button" class="!rounded-lg" (click)="saveInvoiceChanges()" [disabled]="saving()">
+              Salvar
+            </button>
+            <button mat-button type="button" (click)="cancelEdit()" [disabled]="saving()">Cancelar</button>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-gray-200">
+        <div
+          class="grid grid-cols-1 gap-2 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 sm:grid-cols-[2fr_1fr_auto]"
+        >
+          <span>Código / descrição</span>
+          <span class="sm:text-center">Qtd</span>
+          <span *ngIf="editing()" class="hidden sm:block"></span>
+        </div>
+        <div
+          *ngFor="let row of (editing() ? editableLines() : invoice()?.lines); let i = index"
+          class="grid grid-cols-1 items-center gap-3 border-t border-gray-100 px-4 py-3 sm:grid-cols-[2fr_1fr_auto]"
+        >
+          <div>
+            <p class="font-medium text-gray-900">{{ row.productCode }}</p>
+            <p class="text-sm text-gray-500">{{ row.productDescription }}</p>
+          </div>
+          <div class="flex justify-start sm:justify-center">
+            <ng-container *ngIf="editing(); else qRead">
+              <input
+                type="number"
+                min="1"
+                [value]="row.quantity"
+                (change)="updateLineQuantity(i, $any($event.target).valueAsNumber)"
+                class="w-20 rounded-md border border-gray-300 px-2 py-1.5 text-center text-sm tabular-nums focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+              />
+            </ng-container>
+            <ng-template #qRead>
+              <span class="tabular-nums text-sm font-medium">{{ row.quantity }}</span>
+            </ng-template>
+          </div>
+          <div *ngIf="editing()" class="flex justify-end sm:justify-center">
+            <button mat-icon-button color="warn" type="button" (click)="removeEditableLine(i)" aria-label="Remover linha">
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 rounded-xl border border-gray-100 bg-gray-50/60 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Emissão do PDF</p>
+        <ol class="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-gray-600">
+          <li>Confira itens e valor no quadro acima.</li>
+          <li>Com a nota <strong class="font-medium text-gray-800">aberta</strong>, use <strong class="font-medium text-gray-800">Emitir PDF</strong>.</li>
+          <li>O sistema fecha a nota e atualiza o estoque (demo).</li>
+        </ol>
+      </div>
+    </div>
+  </article>
 </div>

@@ -1,49 +1,156 @@
-h1 {
-  @apply text-3xl font-semibold mb-2;
+:host {
+  display: block;
 }
 
-.muted {
-  @apply text-slate-500 mb-6;
+.invoices-page {
+  width: 100%;
+  max-width: min(100%, 88rem);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.card {
-  @apply mb-6;
-}
-
-.composer {
+.invoices-kpis {
   display: grid;
-  grid-template-columns: 2fr 1fr auto;
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgb(229 231 235 / 0.95);
+  background: #fff;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+}
+
+.invoices-kpis__cell {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem 0.875rem;
+  border-right: 1px solid rgb(243 244 246);
 }
 
-.table {
-  @apply w-full overflow-hidden rounded-[22px] border border-slate-200/70 mb-4;
+.invoices-kpis__cell:last-child {
+  border-right: none;
 }
 
-.footer-actions {
-  @apply flex justify-end;
+.invoices-kpis__icon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  color: #047857;
 }
 
-.toolbar-row {
-  @apply flex justify-end gap-3 mb-4;
+.invoices-kpis__icon--muted {
+  background: #f3f4f6;
+  color: #4b5563;
 }
 
-.pill {
-  @apply px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-[0.14em];
+.invoices-kpis__meta {
+  min-width: 0;
 }
 
-.pill.open {
-  @apply bg-emerald-100 text-emerald-700;
+.invoices-kpis__label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
 }
 
-.pill.closed {
-  @apply bg-slate-100 text-slate-700;
+@media (min-width: 640px) {
+  .invoices-kpis__label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+  }
+
+  .invoices-kpis__cell {
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .invoices-kpis__icon {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
 }
 
-@media (max-width: 900px) {
-  .composer {
+.invoices-kpis__value {
+  margin: 0.125rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.invoices-kpis__value--accent {
+  color: #065f46;
+}
+
+@media (min-width: 640px) {
+  .invoices-kpis__value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .invoices-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .invoices-kpis__cell:nth-child(2n) {
+    border-right: none;
+  }
+
+  .invoices-kpis__cell:nth-child(-n + 2) {
+    border-bottom: 1px solid rgb(243 244 246);
+  }
+}
+
+@media (max-width: 359px) {
+  .invoices-kpis {
     grid-template-columns: 1fr;
   }
+
+  .invoices-kpis__cell {
+    border-right: none;
+    border-bottom: 1px solid rgb(243 244 246);
+  }
+
+  .invoices-kpis__cell:last-child {
+    border-bottom: none;
+  }
+}
+
+.invoices-table {
+  th.mat-mdc-header-cell {
+    @apply border-b border-gray-200 bg-gray-50 py-3 pl-6 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+  }
+
+  td.mat-mdc-cell {
+    @apply border-b border-gray-100 py-3 pl-6 text-sm;
+  }
+
+  tr.mat-mdc-row:nth-child(even) td {
+    @apply bg-gray-50/60;
+  }
+
+  tr.mat-mdc-row:hover td {
+    @apply bg-emerald-50/50;
+  }
+}
+
+:host ::ng-deep .invoices-table .mat-mdc-header-row {
+  height: 44px;
+}
+
+:host ::ng-deep .invoices-table .mdc-data-table__content {
+  @apply rounded-none;
 }

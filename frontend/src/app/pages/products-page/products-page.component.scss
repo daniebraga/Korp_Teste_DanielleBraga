@@ -1,43 +1,160 @@
-h1 {
-  @apply text-3xl font-semibold mb-2;
+:host {
+  display: block;
 }
 
-.muted {
-  @apply text-slate-500 mb-6;
+/* Layout principal: não depende só do Tailwind (evita grid “sumir” no build). */
+.products-page {
+  width: 100%;
+  max-width: min(100%, 88rem);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.card {
-  @apply mb-6;
-}
-
-.grid {
+.products-kpis {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgb(229 231 235 / 0.95);
+  background: #fff;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
 }
 
-.span-2 {
-  grid-column: span 2;
+.products-kpis__cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem 0.875rem;
+  border-right: 1px solid rgb(243 244 246);
 }
 
-.actions {
-  @apply col-span-full flex flex-wrap gap-3 items-center;
+.products-kpis__cell:last-child {
+  border-right: none;
 }
 
-.toolbar-row {
-  @apply flex justify-end gap-3 mb-4;
+.products-kpis__icon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  color: #047857;
 }
 
-.table {
-  @apply w-full overflow-hidden rounded-[22px] border border-slate-200/70;
+.products-kpis__icon--muted {
+  background: #f3f4f6;
+  color: #4b5563;
 }
 
-@media (max-width: 800px) {
-  .grid {
+.products-kpis__meta {
+  min-width: 0;
+}
+
+.products-kpis__label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+@media (min-width: 640px) {
+  .products-kpis__label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+  }
+
+  .products-kpis__cell {
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .products-kpis__icon {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+}
+
+.products-kpis__value {
+  margin: 0.125rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .products-kpis__value {
+    font-size: 1.5rem;
+  }
+}
+
+.products-kpis__status {
+  margin: 0.125rem 0 0;
+  font-size: 0.8125rem;
+  color: #374151;
+  line-height: 1.3;
+}
+
+.products-kpis__actions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .products-kpis__actions .mat-mdc-outlined-button {
+    min-width: 0;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Em telas estreitas: ainda 3 colunas, mas compacto; só empilha em <360px */
+@media (max-width: 359px) {
+  .products-kpis {
     grid-template-columns: 1fr;
   }
-  .span-2 {
-    grid-column: auto;
+
+  .products-kpis__cell {
+    border-right: none;
+    border-bottom: 1px solid rgb(243 244 246);
   }
+
+  .products-kpis__cell:last-child {
+    border-bottom: none;
+  }
+}
+
+.products-table {
+  th.mat-mdc-header-cell {
+    @apply border-b border-gray-200 bg-gray-50 py-3 pl-6 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+  }
+
+  td.mat-mdc-cell {
+    @apply border-b border-gray-100 py-3 pl-6 text-sm text-gray-800;
+  }
+
+  tr.mat-mdc-row:nth-child(even) td {
+    @apply bg-gray-50/50;
+  }
+
+  tr.mat-mdc-row:hover td {
+    @apply bg-emerald-50/60;
+  }
+}
+
+:host ::ng-deep .products-table .mat-mdc-header-row {
+  height: 44px;
+}
+
+:host ::ng-deep .products-table .mdc-data-table__content {
+  @apply rounded-none;
 }

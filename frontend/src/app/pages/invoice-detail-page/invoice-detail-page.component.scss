@@ -1,50 +1,24 @@
-.page {
-  @apply space-y-6;
-  position: relative;
+/* Destaque primário verde (mesmo idioma visual do portal) */
+.nf-cta {
+  background: linear-gradient(180deg, #059669 0%, #047857 100%) !important;
+  --mdc-filled-button-container-color: transparent;
+  box-shadow: 0 8px 24px -8px rgba(4, 120, 87, 0.45);
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: flex-start;
-  margin: 1rem 0 1.25rem;
+.nf-cta:hover:not([disabled]) {
+  filter: brightness(1.04);
 }
 
-.actions {
-  @apply flex flex-wrap gap-3 items-center;
-}
-
-.muted {
-  @apply text-slate-500;
-}
-
-.table {
-  @apply w-full overflow-hidden rounded-[22px] border border-slate-200/70;
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  z-index: 3;
-  font-weight: 600;
-}
-
-.hint {
-  @apply text-slate-600;
-  margin-top: 1rem;
+.nf-cta[disabled] {
+  opacity: 0.55;
+  box-shadow: none;
 }
 
 @media print {
-  a,
-  .actions,
-  .hint {
+  a[mat-stroked-button],
+  .nf-cta,
+  button[mat-flat-button],
+  button[mat-stroked-button] {
     display: none !important;
   }
 }

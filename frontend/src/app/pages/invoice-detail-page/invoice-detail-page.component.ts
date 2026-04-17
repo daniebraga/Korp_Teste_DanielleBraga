@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -22,7 +21,6 @@ import { BillingApiService } from '../../services/billing-api.service';
     MatButtonModule,
     MatSnackBarModule,
     MatIconModule,
-    MatCardModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './invoice-detail-page.component.html',

@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+.invoice-dialog {
+  display: block;
+  min-width: min(100vw - 2rem, 32rem);
+}
+
+.invoice-dialog__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, rgb(236 253 245 / 0.9) 0%, rgb(255 255 255) 100%);
+  border: 1px solid rgb(209 250 229 / 0.7);
+}
+
+.invoice-dialog__head-icon {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #047857;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  border: 1px solid rgb(167 243 208 / 0.8);
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.invoice-dialog__eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #059669;
+}
+
+.invoice-dialog__title {
+  margin: 0.25rem 0 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+.invoice-dialog__close {
+  margin-left: auto;
+  color: #6b7280;
+}
+
+.invoice-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.invoice-dialog__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 600px) {
+  .invoice-dialog__row {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .invoice-dialog__field-prod {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
+  .invoice-dialog__field-qty {
+    flex: 0 0 6.5rem;
+    width: 6.5rem;
+  }
+}
+
+.invoice-dialog__table-wrap {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(243 244 246);
+}
+
+.invoice-dialog__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.invoice-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgb(243 244 246);
+}
+
+.draft-table {
+  th.mat-mdc-header-cell {
+    @apply bg-gray-50 py-2.5 pl-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+  }
+
+  td.mat-mdc-cell {
+    @apply border-t border-gray-100 py-2.5 pl-4 text-sm text-gray-800;
+  }
+}

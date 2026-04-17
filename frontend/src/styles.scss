@@ -6,16 +6,74 @@ html {
   min-height: 100%;
 }
 
+/* Material usa Roboto por padrão; unifica com a UI em sans moderna. */
+body.mat-typography {
+  font-family:
+    'Plus Jakarta Sans',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
 body {
-  @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
+  @apply min-h-screen bg-gray-50 text-gray-900 antialiased font-sans;
   margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-image: radial-gradient(circle at top left, rgba(14, 165, 233, 0.16), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.08), transparent 18%);
 }
 
 ::selection {
-  @apply bg-sky-300 text-slate-900;
+  @apply bg-emerald-200/90 text-emerald-950;
+}
+
+/* Modal de produto — cantos e sem padding duplicado do container */
+.product-form-dialog-panel .mat-mdc-dialog-container {
+  padding: 0;
+}
+
+.product-form-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow:
+    0 25px 50px -12px rgb(0 0 0 / 0.18),
+    0 0 0 1px rgb(0 0 0 / 0.04);
+}
+
+.product-form-dialog-panel .mat-mdc-dialog-surface {
+  padding: 1.25rem 1.5rem 1.35rem;
+}
+
+/* Modal de nova nota fiscal */
+.invoice-form-dialog-panel .mat-mdc-dialog-container {
+  padding: 0;
+}
+
+.invoice-form-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow:
+    0 25px 50px -12px rgb(0 0 0 / 0.18),
+    0 0 0 1px rgb(0 0 0 / 0.04);
+}
+
+.invoice-form-dialog-panel .mat-mdc-dialog-surface {
+  padding: 1.25rem 1.5rem 1.35rem;
+}
+
+/* Tema verde floresta / portal (alinhado ao estilo de referência). */
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: #047857;
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mat-filled-button-state-layer-color: rgba(255, 255, 255, 0.22);
+}
+
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: #047857;
+  --mat-outlined-button-state-layer-color: rgba(4, 120, 87, 0.12);
+}
+
+.mat-mdc-icon-button.mat-primary {
+  --mat-icon-button-icon-color: #047857;
 }
 
 button,
@@ -23,9 +81,77 @@ a {
   @apply transition duration-200 ease-in-out;
 }
 
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography .mat-mdc-card-title {
+  font-family: inherit;
+  font-weight: 600;
+}
+
 @layer components {
+  /* Páginas: ritmo calmo, sombra mínima */
+  .page-shell {
+    @apply mx-auto w-full max-w-5xl space-y-8 pb-14 pt-0 sm:space-y-10 sm:pb-16;
+  }
+
+  .page-hero {
+    @apply rounded-2xl border border-gray-200/90 bg-white px-6 py-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04)] sm:px-8 sm:py-9;
+  }
+
+  .page-eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-700;
+  }
+
+  .page-title {
+    @apply text-2xl font-semibold tracking-tight text-gray-900 sm:text-[1.75rem];
+  }
+
+  .page-hero .page-eyebrow + .page-title {
+    @apply mt-2;
+  }
+
+  .page-lead {
+    @apply mt-3 max-w-2xl text-[15px] leading-[1.65] text-gray-500 sm:text-base;
+  }
+
+  .ui-card {
+    @apply overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04)];
+  }
+
+  .ui-card__head {
+    @apply flex flex-col gap-3 border-b border-gray-100/90 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-5;
+  }
+
+  .ui-card__title {
+    @apply text-base font-semibold text-gray-900;
+  }
+
+  .ui-card__subtitle {
+    @apply text-[11px] font-medium uppercase tracking-wider text-gray-400;
+  }
+
+  .ui-card__body {
+    @apply px-6 py-6 sm:px-8 sm:py-7;
+  }
+
+  .ui-stat {
+    @apply rounded-xl border border-gray-200 bg-white px-5 py-5 shadow-sm;
+  }
+
+  .ui-stat__label {
+    @apply text-xs font-medium uppercase tracking-wider text-gray-500;
+  }
+
+  .ui-stat__value {
+    @apply mt-2 text-3xl font-semibold tabular-nums tracking-tight text-gray-900;
+  }
+
+  .ui-stat__hint {
+    @apply mt-1 text-xs text-gray-500;
+  }
+
   .card {
-    @apply bg-white/95 border border-slate-200/70 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.35)] rounded-[28px];
+    @apply bg-white border border-slate-200/80 shadow-soft rounded-3xl;
   }
 
   .muted {

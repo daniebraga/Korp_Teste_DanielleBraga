@@ -1,98 +1,96 @@
-<div class="space-y-4">
-  <div>
-    <h1 class="text-3xl font-semibold mb-2">Notas fiscais</h1>
-    <p class="muted">Numeração sequencial e status gerenciados pelo microsserviço de faturamento.</p>
-  </div>
+<div class="invoices-page space-y-6 pb-14 pt-0 sm:space-y-8 sm:pb-16">
+  <header class="page-hero">
+    <h1 class="page-title">Notas fiscais</h1>
+  </header>
 
-  <mat-card class="card p-6">
-    <mat-card-title class="text-xl font-semibold mb-4">Nova nota</mat-card-title>
-    <mat-card-content>
-      <div class="composer gap-4 items-end">
-      <mat-form-field appearance="outline">
-        <mat-label>Produto</mat-label>
-        <mat-select [formControl]="lineForm.controls.productId">
-          <mat-option *ngFor="let p of products()" [value]="p.id">
-            {{ p.code }} — {{ p.description }} (saldo {{ p.balance }})
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Quantidade</mat-label>
-        <input matInput type="number" [formControl]="lineForm.controls.quantity" />
-      </mat-form-field>
-
-      <button mat-stroked-button type="button" (click)="addLine()">
-        <mat-icon>add</mat-icon>
-        Adicionar
-      </button>
+  <section class="invoices-kpis" aria-label="Resumo">
+    <div class="invoices-kpis__cell">
+      <span class="invoices-kpis__icon" aria-hidden="true">
+        <mat-icon class="!text-[20px]">receipt_long</mat-icon>
+      </span>
+      <div class="invoices-kpis__meta">
+        <p class="invoices-kpis__label">Total</p>
+        <p class="invoices-kpis__value">{{ invoicesTotal() }}</p>
+      </div>
     </div>
-
-    <table *ngIf="lines().length" mat-table [dataSource]="lines()" class="mat-elevation-z1 table">
-      <ng-container matColumnDef="product">
-        <th mat-header-cell *matHeaderCellDef>Produto</th>
-        <td mat-cell *matCellDef="let row">{{ row.productCode }} — {{ row.productDescription }}</td>
-      </ng-container>
-      <ng-container matColumnDef="quantity">
-        <th mat-header-cell *matHeaderCellDef>Qtd</th>
-        <td mat-cell *matCellDef="let row">{{ row.quantity }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row; let i = index">
-          <button mat-icon-button type="button" (click)="removeLine(i)" aria-label="Remover">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="['product', 'quantity', 'actions']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['product', 'quantity', 'actions']"></tr>
-    </table>
-
-    <div class="footer-actions justify-end">
-      <button mat-flat-button color="primary" type="button" (click)="createInvoice()" [disabled]="loading()">
-        Criar nota (Aberta)
-      </button>
+    <div class="invoices-kpis__cell">
+      <span class="invoices-kpis__icon" aria-hidden="true">
+        <mat-icon class="!text-[20px]">lock_open</mat-icon>
+      </span>
+      <div class="invoices-kpis__meta">
+        <p class="invoices-kpis__label">Abertas</p>
+        <p class="invoices-kpis__value invoices-kpis__value--accent">{{ openCount() }}</p>
+      </div>
     </div>
-  </mat-card-content>
-</mat-card>
-
-<mat-card class="card p-6">
-  <mat-card-title>Notas cadastradas</mat-card-title>
-  <mat-card-content>
-    <div class="toolbar-row">
-      <button mat-stroked-button type="button" (click)="reloadAll()" [disabled]="loading()">
-        <mat-icon>refresh</mat-icon>
-        Atualizar
-      </button>
+    <div class="invoices-kpis__cell">
+      <span class="invoices-kpis__icon invoices-kpis__icon--muted" aria-hidden="true">
+        <mat-icon class="!text-[20px]">lock</mat-icon>
+      </span>
+      <div class="invoices-kpis__meta">
+        <p class="invoices-kpis__label">Fechadas</p>
+        <p class="invoices-kpis__value">{{ closedCount() }}</p>
+      </div>
     </div>
+    <div class="invoices-kpis__cell">
+      <span class="invoices-kpis__icon invoices-kpis__icon--muted" aria-hidden="true">
+        <mat-icon class="!text-[20px]">format_list_numbered</mat-icon>
+      </span>
+      <div class="invoices-kpis__meta">
+        <p class="invoices-kpis__label">Linhas</p>
+        <p class="invoices-kpis__value">{{ totalLines() }}</p>
+      </div>
+    </div>
+  </section>
 
-    <table mat-table [dataSource]="invoices()" class="mat-elevation-z1 table">
-      <ng-container matColumnDef="sequentialNumber">
-        <th mat-header-cell *matHeaderCellDef>Nº</th>
-        <td mat-cell *matCellDef="let n">{{ n.sequentialNumber }}</td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let n">
-          <span class="pill" [class.open]="n.status === 'Aberta'" [class.closed]="n.status === 'Fechada'">
-            {{ n.status }}
-          </span>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="items">
-        <th mat-header-cell *matHeaderCellDef>Itens</th>
-        <td mat-cell *matCellDef="let n">{{ n.lines.length }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let n">
-          <a mat-stroked-button [routerLink]="['/notas', n.id]">Detalhes</a>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-  </mat-card-content>
-</mat-card>
+  <section class="ui-card min-h-0">
+    <div class="ui-card__head">
+      <div>
+        <h2 class="ui-card__title">Notas</h2>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button mat-flat-button color="primary" type="button" (click)="openNewInvoiceDialog()" class="!h-9 !rounded-lg !text-sm !font-medium">
+          <mat-icon class="!mr-1 !text-[18px]">note_add</mat-icon>
+          Nova nota
+        </button>
+        <button mat-stroked-button type="button" (click)="reloadAll()" [disabled]="loading()" class="!h-9 !rounded-lg !border-gray-300 !text-xs">
+          <mat-icon class="!mr-1 !text-[16px]">refresh</mat-icon>
+          Atualizar
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto px-4 pb-5 sm:px-6">
+      <table mat-table [dataSource]="invoices()" class="invoices-table mat-elevation-z0 w-full min-w-[440px]">
+        <ng-container matColumnDef="sequentialNumber">
+          <th mat-header-cell *matHeaderCellDef>Nº</th>
+          <td mat-cell *matCellDef="let n" class="font-medium tabular-nums text-gray-900">{{ n.sequentialNumber }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let n">
+            <span
+              class="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
+              [class.bg-emerald-50]="n.status === 'Aberta'"
+              [class.text-emerald-800]="n.status === 'Aberta'"
+              [class.bg-gray-100]="n.status === 'Fechada'"
+              [class.text-gray-700]="n.status === 'Fechada'"
+            >
+              {{ n.status }}
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="items">
+          <th mat-header-cell *matHeaderCellDef class="!text-right">Itens</th>
+          <td mat-cell *matCellDef="let n" class="tabular-nums !text-right text-gray-700">{{ n.lines.length }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="!text-right"></th>
+          <td mat-cell *matCellDef="let n" class="!text-right">
+            <a mat-button color="primary" [routerLink]="['/notas', n.id]" class="!min-w-0 !px-2 !text-sm !font-medium">Abrir</a>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </section>
+</div>
