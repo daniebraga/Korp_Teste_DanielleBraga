@@ -1,0 +1,57 @@
+<a mat-button routerLink="/notas">
+  <mat-icon>arrow_back</mat-icon>
+  Voltar
+</a>
+
+<div *ngIf="invoice() as inv" class="page">
+  <div class="header">
+    <div>
+      <h1>Nota nº {{ inv.sequentialNumber }}</h1>
+      <p class="muted">Status: <strong>{{ inv.status }}</strong></p>
+    </div>
+    <div class="actions">
+      <button
+        mat-flat-button
+        color="accent"
+        type="button"
+        (click)="print()"
+        [disabled]="printing() || inv.status !== 'Aberta'"
+      >
+        <mat-icon>print</mat-icon>
+        Imprimir NF
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="printing()" class="overlay" aria-live="polite">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    <span>Processando impressão e baixa de estoque…</span>
+  </div>
+
+  <mat-card>
+    <mat-card-title>Itens</mat-card-title>
+    <mat-card-content>
+      <table mat-table [dataSource]="inv.lines" class="table">
+        <ng-container matColumnDef="productCode">
+          <th mat-header-cell *matHeaderCellDef>Código</th>
+          <td mat-cell *matCellDef="let row">{{ row.productCode }}</td>
+        </ng-container>
+        <ng-container matColumnDef="productDescription">
+          <th mat-header-cell *matHeaderCellDef>Descrição</th>
+          <td mat-cell *matCellDef="let row">{{ row.productDescription }}</td>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef>Qtd</th>
+          <td mat-cell *matCellDef="let row">{{ row.quantity }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <p class="hint">
+    Dica para o vídeo: interrompa o serviço de estoque e clique em Imprimir para demonstrar o tratamento de falha;
+    em seguida suba o serviço e repita a operação.
+  </p>
+</div>

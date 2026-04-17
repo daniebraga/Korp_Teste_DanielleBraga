@@ -1,0 +1,95 @@
+<h1>Notas fiscais</h1>
+<p class="muted">Numeração sequencial e status gerenciados pelo microsserviço de faturamento.</p>
+
+<mat-card class="card">
+  <mat-card-title>Nova nota</mat-card-title>
+  <mat-card-content>
+    <div class="composer">
+      <mat-form-field appearance="outline">
+        <mat-label>Produto</mat-label>
+        <mat-select [formControl]="lineForm.controls.productId">
+          <mat-option *ngFor="let p of products()" [value]="p.id">
+            {{ p.code }} — {{ p.description }} (saldo {{ p.balance }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Quantidade</mat-label>
+        <input matInput type="number" [formControl]="lineForm.controls.quantity" />
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" (click)="addLine()">
+        <mat-icon>add</mat-icon>
+        Adicionar
+      </button>
+    </div>
+
+    <table *ngIf="lines().length" mat-table [dataSource]="lines()" class="mat-elevation-z1 table">
+      <ng-container matColumnDef="product">
+        <th mat-header-cell *matHeaderCellDef>Produto</th>
+        <td mat-cell *matCellDef="let row">{{ row.productCode }} — {{ row.productDescription }}</td>
+      </ng-container>
+      <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef>Qtd</th>
+        <td mat-cell *matCellDef="let row">{{ row.quantity }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row; let i = index">
+          <button mat-icon-button type="button" (click)="removeLine(i)" aria-label="Remover">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['product', 'quantity', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['product', 'quantity', 'actions']"></tr>
+    </table>
+
+    <div class="footer-actions">
+      <button mat-flat-button color="primary" type="button" (click)="createInvoice()" [disabled]="loading()">
+        Criar nota (Aberta)
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="card">
+  <mat-card-title>Notas cadastradas</mat-card-title>
+  <mat-card-content>
+    <div class="toolbar-row">
+      <button mat-stroked-button type="button" (click)="reloadAll()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon>
+        Atualizar
+      </button>
+    </div>
+
+    <table mat-table [dataSource]="invoices()" class="mat-elevation-z1 table">
+      <ng-container matColumnDef="sequentialNumber">
+        <th mat-header-cell *matHeaderCellDef>Nº</th>
+        <td mat-cell *matCellDef="let n">{{ n.sequentialNumber }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let n">
+          <span class="pill" [class.open]="n.status === 'Aberta'" [class.closed]="n.status === 'Fechada'">
+            {{ n.status }}
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="items">
+        <th mat-header-cell *matHeaderCellDef>Itens</th>
+        <td mat-cell *matCellDef="let n">{{ n.lines.length }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let n">
+          <a mat-stroked-button [routerLink]="['/notas', n.id]">Detalhes</a>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
