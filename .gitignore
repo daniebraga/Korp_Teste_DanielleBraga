@@ -1,1 +1,10 @@
 **/.vs/
+
+# Ignore build output and generated files
+**/bin/
+**/obj/
+
+# Ignore local database artifacts
+*.db
+*.db-shm
+*.db-wal

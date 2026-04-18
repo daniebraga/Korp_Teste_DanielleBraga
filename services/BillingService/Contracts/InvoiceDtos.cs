@@ -6,6 +6,10 @@ public sealed record InvoiceLineRequest(Guid ProductId, string ProductCode, stri
 
 public sealed record CreateInvoiceRequest(IReadOnlyList<InvoiceLineRequest> Lines);
 
+public sealed record UpdateInvoiceLineRequest(Guid Id, int Quantity);
+
+public sealed record UpdateInvoiceRequest(IReadOnlyList<UpdateInvoiceLineRequest> Lines);
+
 public sealed record InvoiceLineResponse(
     Guid Id,
     Guid ProductId,

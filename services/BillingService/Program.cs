@@ -125,6 +125,86 @@ app.MapPost("/api/invoices", async (CreateInvoiceRequest body, BillingDbContext 
     }
 });
 
+app.MapPut("/api/invoices/{id:guid}", async (
+    Guid id,
+    UpdateInvoiceRequest body,
+    BillingDbContext db,
+    CancellationToken ct) =>
+{
+    if (body.Lines.Count == 0)
+    {
+        return Results.BadRequest(new { message = "Inclua ao menos uma linha na nota." });
+    }
+
+    if (body.Lines.Any(l => l.Quantity <= 0))
+    {
+        return Results.BadRequest(new { message = "Quantidades devem ser maiores que zero." });
+    }
+
+    var invoice = await db.Invoices.Include(i => i.Lines).FirstOrDefaultAsync(i => i.Id == id, ct);
+    if (invoice is null)
+    {
+        return Results.NotFound(new { message = "Nota não encontrada." });
+    }
+
+    if (invoice.Status != InvoiceStatus.Aberta)
+    {
+        return Results.BadRequest(new { message = "Somente notas com status Aberta podem ser alteradas." });
+    }
+
+    var requestedIds = body.Lines.Select(l => l.Id).ToHashSet();
+    if (requestedIds.Count != body.Lines.Count)
+    {
+        return Results.BadRequest(new { message = "Cada linha deve ser única." });
+    }
+
+    var existingLines = invoice.Lines.ToDictionary(l => l.Id);
+    foreach (var line in body.Lines)
+    {
+        if (!existingLines.TryGetValue(line.Id, out var existingLine))
+        {
+            return Results.BadRequest(new { message = $"Linha de nota {line.Id} não encontrada." });
+        }
+
+        existingLine.Quantity = line.Quantity;
+    }
+
+    var linesToRemove = invoice.Lines.Where(l => !requestedIds.Contains(l.Id)).ToList();
+    foreach (var line in linesToRemove)
+    {
+        invoice.Lines.Remove(line);
+    }
+
+    try
+    {
+        await db.SaveChangesAsync(ct);
+        return Results.Ok(InvoiceMapper.ToResponse(invoice));
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
+    }
+});
+
+app.MapDelete("/api/invoices/{id:guid}", async (Guid id, BillingDbContext db, CancellationToken ct) =>
+{
+    var invoice = await db.Invoices.Include(i => i.Lines).FirstOrDefaultAsync(i => i.Id == id, ct);
+    if (invoice is null)
+    {
+        return Results.NotFound(new { message = "Nota não encontrada." });
+    }
+
+    if (invoice.Status != InvoiceStatus.Aberta)
+    {
+        return Results.BadRequest(new { message = "Somente notas com status Aberta podem ser excluídas." });
+    }
+
+    db.Invoices.Remove(invoice);
+    await db.SaveChangesAsync(ct);
+
+    return Results.NoContent();
+});
+
 app.MapPost("/api/invoices/{id:guid}/print", async (
     Guid id,
     BillingDbContext db,
